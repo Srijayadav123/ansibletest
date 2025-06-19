@@ -1,0 +1,38 @@
+---
+- name: Install required Python packages (Ubuntu)
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - python3-pip
+    - python3-dev
+
+- name: Install boto and boto3 using pip
+  pip:
+    name:
+      - boto
+      - boto3
+
+- name: Create AWS EC2 Instance
+  ec2:
+    key_name: wezva                            # 🔁 Change this to your key pair
+    instance_type: t2.micro
+    image: ami-0c58c1dd3                       # 🔁 Replace with a valid AMI ID
+    wait: true
+    region: us-east-1
+    count: 1
+    assign_public_ip: yes
+  register: ec2
+
+- name: Show created EC2 instance info
+  debug:
+    var: item
+  loop: "{{ ec2.instances }}"
+
+- name: Add new instance to host group dynamically
+  template:
+    src: hosts.j2
+    dest: hosts.test
+  tags: dynamicinventory
+  loop: "{{ ec2.instances }}"

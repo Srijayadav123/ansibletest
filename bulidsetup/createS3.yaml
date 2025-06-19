@@ -1,0 +1,7 @@
+--- # Creating S3 Bucket
+- hosts: local              # change this to the group where your master is preset
+  become: yes
+  connection: local
+  gather_facts: no
+  roles:
+    - s3

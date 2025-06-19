@@ -1,0 +1,27 @@
+---
+- name: Install required Python packages (Ubuntu)
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - python3-pip
+    - python3-dev
+
+- name: Install boto using pip
+  pip:
+    name: boto
+
+- name: Create S3 bucket
+  aws_s3:
+    bucket: mys3bucket                      # 🔁 Change this to a unique bucket name
+    mode: create
+    region: us-east-1                      # 🔁 Adjust region as needed
+    permission: public-read
+    object: ""
+    overwrite: yes
+  register: s3_result
+
+- name: Show S3 creation result
+  debug:
+    var: s3_result
